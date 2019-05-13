@@ -8,7 +8,7 @@ import re,os
 path = "./network-stuff/"
 switches = os.listdir(path)
 
-def ragamoffin( check ):
+def checkswitch ( check ):
     if re.match("(.*)(Operating)(.*)", check):
         print ("Current Switch VTP mode: "), check,
     if re.match("(.*)(Domain)(.*)", check):
@@ -27,5 +27,5 @@ for switch in switches:
     vlanwritten = False
 
     for line in text:
-        ragamoffin(line)
+        checkswitch(line)
     print("")
