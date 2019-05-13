@@ -1,0 +1,42 @@
+#!/usr/bin/python3
+#Simple Layer 7 URL availability monitor which checks if the web server 
+#is not responding for given URL and then waits and then checks again.
+#When server is alive and happily responds with status 200 for the given URL 
+#then the script says that the service is available and stops.
+#Wrote this yesterday cause I was trying to do my job and RSA authentication service was offline
+#So I wanted to know when it comes back up so i could import some sw-tokens. 
+#ICMP to hosts is often forbidden because many sysadmins value paranoia over reason. 
+
+import requests,time,sys
+
+
+checktimeperiod = 10
+
+if len(sys.argv) == 2: #added cli input to feed a different URL
+  url = sys.argv[1]
+  if url[:3] != "http":
+    url = "http://" + url
+    print("added http to URI cause it's missing but required.\n" \
+    "If you need https then add it manually in front of the URL\n")
+else:
+  url = "https://auth.rsasecurity.com/ims-rba"
+print(f"checking if {url} is available")
+
+while True:
+  try:
+    r = requests.get(url)
+    if r.status_code == 200:
+      print(r.url +" URL/service available")
+      break
+    else:
+      print("Server response code: ", r.status_code)
+      break
+  except KeyboardInterrupt:
+    print("\n\n\nCheckus interruptus!") #without KbdInterrupting while time.sleep it might loop forever
+    break 
+  except:
+    print(f"Service currently unavailable. Waiting {checktimeperiod} sec and checking again.")
+  try:
+    time.sleep(checktimeperiod)
+  except:
+   break #to remove garbage from screen when ctrl-c-ing out of the program while time.sleep
